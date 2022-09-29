@@ -51,7 +51,8 @@ router.post('/register',[
     const per = new user({
         name:req.body.name,
         email:req.body.email,
-        password:hashedPassword
+        password:hashedPassword,
+        date:req.body.date
     });
     try {
         const savedUser = await per.save();
@@ -60,10 +61,7 @@ router.post('/register',[
         res.status(400).send(err);
     }
 });
-// cookie login
-router.post('cLogin',(req,res) =>{
 
-})
 
 // login
 router.post('/Logins',
@@ -92,7 +90,7 @@ const users = await user.findOne({email: req.body.email});
     if(!validPass) return res.status(400).send("Invalid Password")
 
     // create token
-    const maxAge = 3*2460*60;
+    const maxAge = 3*24*60*60;
     const token = JWT.sign({_id: users._id},"secretCode",{expiresIn: maxAge});
     res.cookie('jwt',token,{maxAge:maxAge*1000});
     res.header('auth-token',token).send(token);

@@ -3,7 +3,8 @@ const express = require("express");
 const { default: mongoose } = require("mongoose");
 const auth = require("./routes/auth")
 const post = require("./routes/post")
-const appoin = require("./routes/appoinment")
+const bookDate = require("./routes/availableDate");
+const admin = require("./routes/admin")
 
 
 const app = express()
@@ -11,14 +12,22 @@ const app = express()
 mongoose.connect(
     'mongodb+srv://Alan:alan1234@cluster0.jdx9yh4.mongodb.net/?retryWrites=true&w=majority',
     { useNewUrlParser: true},
-() => console.log("connected to db"));
+() => console.log("Look Up"));
+mongoose.connection.on("disconnected",() =>{
+    console.log("mongoDB Disconnected")
+});
+mongoose.connection.on("connected",() =>{
+    console.log("mongoDB Connected")
+});
+
 
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", auth);
 app.use("/posts", post);
-app.use("/app", appoin);
+app.use("/session", bookDate);
+app.use("/admin", admin);
 
 app.set("views","./routes/views")
 app.set("view engine","ejs")
