@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const JWT = require("jsonwebtoken")
 const fs = require('fs')
 const user = require('../model/User');
+const multer = require("multer");
 
 // vaidation
 
@@ -135,9 +136,40 @@ router.get('/Logout',(req,res) =>{
 })
 
 
-// old one
+// storage
+const Storage = multer.diskStorage({
+    destination:'uploads',
+    filename: (req,file, cb) =>{
+        cb(null,file.originalname);
+    },
+});
 
+const upload = multer({
+    storage:Storage
+}).single('testImage')
 
+// upload screenshot
+router.post('/upload/:id',(req,res) =>{
+    upload(req,res,(err) =>{
+        if (err) {
+            console.log(err)
+        } else {
+            let id = req.params.id;
+            user.findByIdAndUpdate(id,{
+                image:{
+                    data:req.file.filename,
+                    contentType: "image/png",
+                }
+            },(err,result) =>{
+                if (err) {
+                    res.json(err)
+                } else {
+                    res.send("image uploaded successfully")
+                }
+            })
+        }
+    })
+})
 
 
 

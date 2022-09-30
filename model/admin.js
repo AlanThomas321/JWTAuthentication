@@ -9,16 +9,14 @@ const adminSchema = new mongoose.Schema({
     },
     qualification:{
         type:String,
-        required:true
     },
     ContactNumber:{
         type:Number,
-        required:true,
         min:6
     },
     About:{
         type:String,
-        required:true
+        
     },
     email:{
         type:String,
