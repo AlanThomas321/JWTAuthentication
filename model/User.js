@@ -19,10 +19,19 @@ const userSchema = new mongoose.Schema({
         min:6,
         max:1024
     },
+    name:{
+        type:String,
+        required:true
+    },
+    image:{
+        data:Buffer,
+        contentType:String
+    },
     date:{
-        type:Date,
-        default:Date.now
-    }
+        type:Date
+        
+    },
+   
 });
 
 module.exports = mongoose.model('User',userSchema);

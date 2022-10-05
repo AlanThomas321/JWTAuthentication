@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const JWT = require("jsonwebtoken")
 const fs = require('fs')
 const user = require('../model/User');
+const multer = require("multer");
 
 // vaidation
 
@@ -51,7 +52,8 @@ router.post('/register',[
     const per = new user({
         name:req.body.name,
         email:req.body.email,
-        password:hashedPassword
+        password:hashedPassword,
+        date:req.body.date
     });
     try {
         const savedUser = await per.save();
@@ -60,10 +62,7 @@ router.post('/register',[
         res.status(400).send(err);
     }
 });
-// cookie login
-router.post('cLogin',(req,res) =>{
 
-})
 
 // login
 router.post('/Logins',
@@ -92,7 +91,7 @@ const users = await user.findOne({email: req.body.email});
     if(!validPass) return res.status(400).send("Invalid Password")
 
     // create token
-    const maxAge = 3*2460*60;
+    const maxAge = 3*24*60*60;
     const token = JWT.sign({_id: users._id},"secretCode",{expiresIn: maxAge});
     res.cookie('jwt',token,{maxAge:maxAge*1000});
     res.header('auth-token',token).send(token);
@@ -137,9 +136,40 @@ router.get('/Logout',(req,res) =>{
 })
 
 
-// old one
+// storage
+const Storage = multer.diskStorage({
+    destination:'uploads',
+    filename: (req,file, cb) =>{
+        cb(null,file.originalname);
+    },
+});
 
+const upload = multer({
+    storage:Storage
+}).single('testImage')
 
+// upload screenshot
+router.post('/upload/:id',(req,res) =>{
+    upload(req,res,(err) =>{
+        if (err) {
+            console.log(err)
+        } else {
+            let id = req.params.id;
+            user.findByIdAndUpdate(id,{
+                image:{
+                    data:req.file.filename,
+                    contentType: "image/png",
+                }
+            },(err,result) =>{
+                if (err) {
+                    res.json(err)
+                } else {
+                    res.send("image uploaded successfully")
+                }
+            })
+        }
+    })
+})
 
 
 
