@@ -5,11 +5,20 @@ const bcrypt = require("bcrypt")
 const JWT = require("jsonwebtoken")
 const fs = require('fs')
 const user = require('../model/User');
+const Consultantdetails = require('../model/admin')
+const multer = require('multer') 
 
 // vaidation
 
 const Joi = require("@hapi/joi");
 
+const Storage = multer.diskStorage({
+    destination:'uploads',
+    filename:(req,file,cb) => {
+        cb(null,file.originalname)
+    }
+});
+const upload = multer({storage:Storage}).single('testImage');
 const schema = {
     name: Joi.string()
     .min(6)
@@ -51,7 +60,8 @@ router.post('/register',[
     const per = new user({
         name:req.body.name,
         email:req.body.email,
-        password:hashedPassword
+        password:hashedPassword,
+        date:req.body.date
     });
     try {
         const savedUser = await per.save();
@@ -60,10 +70,7 @@ router.post('/register',[
         res.status(400).send(err);
     }
 });
-// cookie login
-router.post('cLogin',(req,res) =>{
 
-})
 
 // login
 router.post('/Logins',
@@ -92,7 +99,7 @@ const users = await user.findOne({email: req.body.email});
     if(!validPass) return res.status(400).send("Invalid Password")
 
     // create token
-    const maxAge = 3*2460*60;
+    const maxAge = 3*24*60*60;
     const token = JWT.sign({_id: users._id},"secretCode",{expiresIn: maxAge});
     res.cookie('jwt',token,{maxAge:maxAge*1000});
     res.header('auth-token',token).send(token);
@@ -140,7 +147,98 @@ router.get('/Logout',(req,res) =>{
 // old one
 
 
+// old one
 
+//User detail fetch
+  
+router.get("/find/:id",  async(req,res ,next)=>{
+  
+        try {
+          const findUser = await user.findById(req.params.id);
+          res.status(200).json(findUser);
+        } catch (err) {
+          next(err);
+        }
+      });
+//update user
+
+// router.put("/:id",  async(req,res)=>{
+    
+//     try{
+//         const updateUserdetails= await  Consultantdetails.findByIdAndUpdate(req.params.id,
+//             {$set: req.body},
+//             {new:true})
+
+// res.status(200).json(updateConsultantdetails);
+//    } 
+//    catch(err){
+//     res.status(500).json(err)
+//    }
+// });
+
+router.put("/update/:id",async(req,res)=>{
+    // let upid = req.params.id;
+    // let upname = req.body.name;
+    // let upemail = req.body.email;
+    try{
+        const userDetails = await user.findByIdAndUpdate(req.params.id,{$set:req.body},{new:true})
+        
+         res.status(200).json(userDetails);
+            } 
+           catch(err){
+           res.status(500).json(err)
+            }
+   
+    });
+
+ //filter
+ 
+router.get('/search/:key',async(req,res) => {
+    let categ = await Consultantdetails.find(
+        {
+            "$or":[
+                {cateogory:{$regex:req.params.key}}
+            ]
+        }
+    )
+    res.send(categ)
+})
+
+
+router.post('/image/upload',(req,res) => {
+    upload(req,res,(err) => {
+       if(err){
+           console.log(err)
+       }
+       else{
+           const newImage = new user({
+               image:{
+                   data:req.file.filename,
+                   contentType:('image/png' || 'image/jpg' || 'image/jpeg')
+               }
+           })
+           newImage.save()
+           .then(() => res.send('successfully uploaded'))
+           .catch(err => console.log(err))
+       }
+    })
+})
+
+
+//find one image
+router.get('/image/find/:id',async (req, res) => { 
+   try {
+       const findImage = await user.findById(req.params.id);
+       res.status(200).json(findImage);
+     } catch (err) {
+       next(err);
+     }
+  
+});
+
+
+
+ 
 
 
 module.exports = router
