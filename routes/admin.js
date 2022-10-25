@@ -2,8 +2,7 @@ const router = require("express").Router();
 const { check, validationResult } = require("express-validator")
 const bcrypt = require("bcrypt")
 const JWT = require("jsonwebtoken")
-const Consultantdetails = require('../model/admin')
-
+const admin = require('../model/admin')
 
 // admin signup
 router.post('/register',[
@@ -107,19 +106,6 @@ router.get('/Logout',(req,res) =>{
     res.send("User Logged out")
 })
 
-router.put("/:id",  async(req,res)=>{
-   
-    
-    try{
-        const updateConsultantdetails= await  Consultantdetails.findByIdAndUpdate(req.params.id,
-            {$set: req.body},
-            {new:true})
 
-res.status(200).json(updateConsultantdetails);
-   } 
-   catch(err){
-    res.status(500).json(err)
-   }
-});
 
-module.exports = router
+module.exports = router;

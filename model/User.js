@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     ContactNumber:{
         type:Number, 
         min:6
-    },
+    } ,
     date:{
         type:Date
         

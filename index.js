@@ -6,11 +6,17 @@ const post = require("./routes/post")
 const bookDate = require("./routes/availableDate");
 const admin = require("./routes/admin")
 const consultantdetailsRoute = require('./routes/admin')
+const bookDate = require("./routes/avilableDate");
+const admin = require("./routes/admin");
+const consultantdetailsRoute= require('./routes/consultantdetails');
+const adminpanel =require('./routes/adminpanel')
+
 
 const app = express()
 // connect to db
 mongoose.connect(
     'mongodb+srv://admin25:admin25@cluster0.ritn0a9.mongodb.net/?retryWrites=true&w=majority',
+    // 'mongodb+srv://Alan:alan1234@cluster0.jdx9yh4.mongodb.net/?retryWrites=true&w=majority',
     { useNewUrlParser: true},
 () => console.log("Look Up"));
 mongoose.connection.on("disconnected",() =>{
@@ -32,6 +38,12 @@ app.use("/consultantdetailsRoute", consultantdetailsRoute)
 
 
 app.use('/',require('./routes/imageRoute'))
+// app.use("/Consultantdetails", Consultantdetails);
+
+// app.use("/rescheuleBookingRoute", rescheuleBookingRoute);
+
+ app.use("/consultantdetailsRoute", consultantdetailsRoute)
+ app.use("/adminconsultant", adminpanel)
 app.set("views","./routes/views")
 app.set("view engine","ejs")
 
